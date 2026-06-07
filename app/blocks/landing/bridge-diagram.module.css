@@ -1,0 +1,117 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.pipe {
+  stroke: rgba(120, 170, 255, 0.16);
+  stroke-width: 2;
+  fill: none;
+}
+
+/* Light beam: a short dash that travels along the path. */
+.beam {
+  stroke: url(#beam);
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 60 600;
+  filter: url(#soft);
+  animation: flow 2.6s linear infinite;
+}
+
+.egressBeam {
+  stroke: #4FABFF;
+  stroke-width: 4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 50 320;
+  filter: drop-shadow(0 0 6px rgba(79, 171, 255, 0.9));
+  animation: flow 2.6s linear infinite;
+  animation-delay: 1.1s;
+}
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 660;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.inputNode {
+  fill: rgba(8, 14, 28, 0.9);
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.outputNode {
+  fill: rgba(79, 171, 255, 0.2);
+  stroke: #4FABFF;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 14px rgba(79, 171, 255, 0.85));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.hub {
+  fill: rgba(14, 22, 44, 0.85);
+  stroke: rgba(120, 170, 255, 0.5);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 24px rgba(7, 110, 255, 0.45));
+}
+
+.hubTitle {
+  fill: var(--color-text);
+  font-family: var(--family-display);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.hubSub {
+  fill: var(--color-text-muted);
+  font-family: var(--family-body);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.nodeLabel {
+  fill: var(--color-text-secondary);
+  font-family: var(--family-body);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.outputLabel {
+  fill: var(--color-text);
+  font-family: var(--family-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .nodeLabel {
+    font-size: 18px;
+  }
+  .hubTitle {
+    font-size: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam,
+  .egressBeam {
+    animation: none;
+    opacity: 0.5;
+  }
+}

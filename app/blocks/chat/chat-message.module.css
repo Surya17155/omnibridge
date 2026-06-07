@@ -1,0 +1,99 @@
+.userRow,
+.botRow {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  align-items: flex-start;
+}
+
+.userRow {
+  flex-direction: row-reverse;
+}
+
+.userAvatar,
+.botAvatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.userAvatar {
+  background: var(--gradient-accent);
+  box-shadow: var(--shadow-glow-soft);
+}
+
+.botAvatar {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+}
+
+.userBubble,
+.botBubble {
+  max-width: 75%;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.userBubble {
+  background: var(--gradient-accent);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  box-shadow: var(--shadow-glow-soft);
+}
+
+.botBubble {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  border-bottom-left-radius: 4px;
+}
+
+.text {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.image {
+  display: block;
+  max-width: 100%;
+  max-height: 240px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+  object-fit: contain;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.meta strong {
+  color: var(--color-primary-muted);
+  font-weight: 600;
+}
+
+.errorText {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}

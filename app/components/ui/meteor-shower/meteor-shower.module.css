@@ -1,0 +1,63 @@
+.field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.meteor {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 0 12px 2px rgba(120, 180, 255, 0.9), 0 0 4px 1px #ffffff;
+  opacity: 0;
+  /* Rotate defines the angle. Subsequent X-only translations will travel perfectly along this 18deg line! */
+  rotate: 18deg;
+  animation-name: meteor;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* The glowing tail trailing behind each meteor head. */
+.meteor::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 2px;
+  width: var(--tail-width, 150px);
+  height: 1.5px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, rgba(160, 210, 255, 0.95) 60%, rgba(255, 255, 255, 1));
+}
+
+@keyframes meteor {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  1.5% {
+    opacity: 1;
+  }
+  26% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+    /* Travel exclusively along the rotated X-axis for 150vw.
+       This prevents the "downward drop" effect and ensures it reaches the far-right edge */
+    transform: translate3d(150vw, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(150vw, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field {
+    display: none;
+  }
+}

@@ -1,0 +1,119 @@
+.section {
+  composes: card from global;
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.header {
+  composes: section-header from global;
+}
+
+.title {
+  composes: section-title from global;
+}
+
+.subtitle {
+  composes: section-subtitle from global;
+}
+
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.stat {
+  padding: var(--space-5);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  cursor: default;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stat:hover {
+  border-color: rgba(79, 171, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(79, 171, 255, 0.08);
+}
+
+.statValue {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.chartArea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chartLabel {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.barRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.barLabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  width: 80px;
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 500;
+}
+
+.barTrack {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 8px rgba(79, 171, 255, 0.15);
+}
+
+.barCount {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  width: 50px;
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--family-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill {
+    transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}

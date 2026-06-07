@@ -1,0 +1,62 @@
+{
+  "name": "project",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "react-router build",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
+    "typecheck": "react-router typegen && tsc"
+  },
+  "dependencies": {
+    "@21st-dev/magic": "^0.1.0",
+    "@dazl/color-scheme": "^1.2.1",
+    "@hookform/resolvers": "^5.2.2",
+    "@libsql/client": "^0.17.3",
+    "@react-router/node": "^7.15.1",
+    "@react-router/serve": "^7.15.1",
+    "@remotion/mcp": "^4.0.472",
+    "@supabase/supabase-js": "^2.107.0",
+    "@tabler/icons-react": "^3.44.0",
+    "@xyflow/react": "^12.10.2",
+    "bcryptjs": "^3.0.3",
+    "classnames": "^2.5.1",
+    "framer-motion": "^12.40.0",
+    "isbot": "^5.1.40",
+    "mermaid": "^11.15.0",
+    "monaco-editor": "^0.55.1",
+    "motion": "^12.40.0",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-hook-form": "^7.76.0",
+    "react-image-gallery": "^2.1.2",
+    "react-router": "^7.15.1",
+    "three": "^0.184.0",
+    "unicornstudio-react": "^2.1.9",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@dazl-lib/radix-ui": "^0.1.0",
+    "@dazl/component-gallery": "^2.0.1",
+    "@dazl/dev": "^1.4.0",
+    "@react-router/dev": "^7.15.1",
+    "@types/node": "24",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
+    "prettier": "^3.8.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.13"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "endOfLine": "auto"
+  },
+  "overrides": {
+    "@react-router/dev": {
+      "vite-node": "^6.0.0"
+    },
+    "@radix-ui/react-primitive": "2.1.3"
+  }
+}

@@ -1,0 +1,102 @@
+.section {
+  composes: card from global;
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  composes: section-title from global;
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  composes: section-subtitle from global;
+  margin-bottom: var(--space-5);
+}
+
+.settingsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+.settingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  gap: var(--space-4);
+}
+
+.settingInfo .settingName {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.settingInfo .settingDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+.toggle.on { background: var(--color-primary); }
+.toggle.off { background: var(--color-border-strong); }
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle.on .toggleThumb { left: 23px; }
+.toggle.off .toggleThumb { left: 3px; }
+
+.ipSection {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--space-5);
+}
+
+.ipTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.ipDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
+.ipInput {
+  composes: form-input from global;
+  font-family: var(--family-mono);
+  max-width: 360px;
+}
+
+.addIpBtn {
+  composes: btn btn-secondary from global;
+  margin-top: var(--space-2);
+}

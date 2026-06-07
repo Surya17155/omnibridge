@@ -1,0 +1,11 @@
+.page {
+  composes: page from global;
+}
+
+.pageTitle {
+  composes: page-title from global;
+}
+
+.pageSubtitle {
+  composes: page-subtitle from global;
+}

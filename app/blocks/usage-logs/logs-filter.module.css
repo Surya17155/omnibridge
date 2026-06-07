@@ -1,0 +1,47 @@
+.section {
+  composes: card from global;
+  padding: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.filterRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.group {
+  composes: form-group from global;
+}
+
+.label {
+  composes: form-label from global;
+}
+
+.select {
+  composes: form-input from global;
+  cursor: pointer;
+}
+
+.input {
+  composes: form-input from global;
+}
+
+.resetBtn {
+  composes: btn btn-secondary from global;
+  height: 36px;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .filterRow {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .filterRow {
+    grid-template-columns: 1fr;
+  }
+}

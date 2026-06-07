@@ -1,0 +1,437 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 140px var(--space-6) var(--space-12);
+  text-align: center;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  width: 1000px;
+  height: 640px;
+  max-width: 140vw;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(7, 110, 255, 0.5), rgba(56, 189, 248, 0.12) 55%, transparent 75%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 75%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.heroInner {
+  position: relative;
+  z-index: 1;
+  max-width: 840px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroTag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  margin-bottom: var(--space-6);
+  backdrop-filter: blur(10px);
+}
+
+.heroTitle {
+  font-family: var(--family-display);
+  font-size: clamp(2.75rem, 8vw, 5.5rem);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.03;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-5);
+}
+
+.heroAccent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.heroSub {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  color: var(--color-text-secondary);
+  max-width: 640px;
+  margin: 0 auto var(--space-8);
+  line-height: 1.65;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 560px) {
+  .heroActions {
+    width: 100%;
+  }
+}
+
+/* --- Custom Animated Uiverse Button --- */
+.btnWrapper {
+  position: relative;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn {
+  --border-radius: 24px;
+  --padding: 4px;
+  --transition: 0.4s;
+  --button-color: #0c101b;
+  --highlight-color-hue: 210deg;
+
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6em 1.2em;
+  font-family: var(--family-display), "Inter", sans-serif;
+  font-size: 1.1em;
+  font-weight: 500;
+
+  background-color: var(--button-color);
+
+  box-shadow:
+    inset 0px 1px 1px rgba(255, 255, 255, 0.2),
+    inset 0px 2px 2px rgba(255, 255, 255, 0.15),
+    inset 0px 4px 4px rgba(255, 255, 255, 0.1),
+    inset 0px 8px 8px rgba(255, 255, 255, 0.05),
+    inset 0px 16px 16px rgba(255, 255, 255, 0.05),
+    0px -1px 1px rgba(0, 0, 0, 0.02),
+    0px -2px 2px rgba(0, 0, 0, 0.03),
+    0px -4px 4px rgba(0, 0, 0, 0.05),
+    0px -8px 8px rgba(0, 0, 0, 0.06),
+    0px -16px 16px rgba(0, 0, 0, 0.08);
+
+  border: solid 1px #fff2;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+
+  transition:
+    box-shadow var(--transition),
+    border var(--transition),
+    background-color var(--transition);
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  top: calc(0px - var(--padding));
+  left: calc(0px - var(--padding));
+  width: calc(100% + var(--padding) * 2);
+  height: calc(100% + var(--padding) * 2);
+  border-radius: calc(var(--border-radius) + var(--padding));
+  pointer-events: none;
+  background-image: linear-gradient(0deg, #0004, #000a);
+
+  z-index: -1;
+  transition:
+    box-shadow var(--transition),
+    filter var(--transition);
+  box-shadow:
+    0 -8px 8px -6px #0000 inset,
+    0 -16px 16px -8px #00000000 inset,
+    1px 1px 1px #fff2,
+    2px 2px 2px #fff1,
+    -1px -1px 1px #0002,
+    -2px -2px 2px #0001;
+}
+
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: linear-gradient(
+    0deg,
+    #fff,
+    hsl(var(--highlight-color-hue), 100%, 70%),
+    hsla(var(--highlight-color-hue), 100%, 70%, 50%),
+    8%,
+    transparent
+  );
+  background-position: 0 0;
+  opacity: 0;
+  transition:
+    opacity var(--transition),
+    filter var(--transition);
+}
+
+.btnLetter {
+  position: relative;
+  display: inline-block;
+  color: #fff5;
+  animation: letter-anim 2s ease-in-out infinite;
+  transition:
+    color var(--transition),
+    text-shadow var(--transition),
+    opacity var(--transition);
+}
+
+@keyframes letter-anim {
+  50% {
+    text-shadow: 0 0 3px #fff8;
+    color: #fff;
+  }
+}
+
+.btnSvg {
+  height: 20px;
+  width: 20px;
+  margin-right: 0.6rem;
+  fill: #e8e8e8;
+  animation: flicker 2s linear infinite;
+  animation-delay: 0.5s;
+  filter: drop-shadow(0 0 2px #fff9);
+  transition:
+    fill var(--transition),
+    filter var(--transition),
+    opacity var(--transition);
+}
+
+@keyframes flicker {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Focus state */
+.txtWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 6.8em;
+  height: 24px;
+}
+
+.txt1,
+.txt2 {
+  position: absolute;
+  left: 0;
+  display: flex;
+  gap: 1px;
+}
+
+.txt1 {
+  animation: appear-anim 1s ease-in-out forwards;
+}
+
+.txt2 {
+  opacity: 0;
+}
+
+@keyframes appear-anim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.btn:focus .txt1 {
+  animation: opacity-anim 0.3s ease-in-out forwards;
+  animation-delay: 1s;
+}
+
+.btn:focus .txt2 {
+  animation: opacity-anim 0.3s ease-in-out reverse forwards;
+  animation-delay: 1s;
+}
+
+@keyframes opacity-anim {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.btn:focus .btnLetter {
+  animation:
+    focused-letter-anim 1s ease-in-out forwards,
+    letter-anim 1.2s ease-in-out infinite;
+  animation-delay: 0s, 1s;
+}
+
+@keyframes focused-letter-anim {
+  0%,
+  100% {
+    filter: blur(0px);
+  }
+  50% {
+    transform: scale(1.3);
+    filter: blur(4px) brightness(150%)
+      drop-shadow(-12px 4px 4px hsl(var(--highlight-color-hue), 100%, 70%));
+  }
+}
+
+.btn:focus .btnSvg {
+  animation-duration: 1.2s;
+  animation-delay: 0.2s;
+}
+
+.btn:focus::before {
+  box-shadow:
+    0 -8px 12px -6px #fff3 inset,
+    0 -16px 16px -8px hsla(var(--highlight-color-hue), 100%, 70%, 20%) inset,
+    1px 1px 1px #fff3,
+    2px 2px 2px #fff1,
+    -1px -1px 1px #0002,
+    -2px -2px 2px #0001;
+}
+
+.btn:focus::after {
+  opacity: 0.6;
+  mask-image: linear-gradient(0deg, #fff, transparent);
+  filter: brightness(100%);
+}
+
+/* Animation delays for .btnLetter elements */
+.btnLetter:nth-child(1),
+.btn:focus .btnLetter:nth-child(1) {
+  animation-delay: 0s;
+}
+.btnLetter:nth-child(2),
+.btn:focus .btnLetter:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.btnLetter:nth-child(3),
+.btn:focus .btnLetter:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.btnLetter:nth-child(4),
+.btn:focus .btnLetter:nth-child(4) {
+  animation-delay: 0.24s;
+}
+.btnLetter:nth-child(5),
+.btn:focus .btnLetter:nth-child(5) {
+  animation-delay: 0.32s;
+}
+.btnLetter:nth-child(6),
+.btn:focus .btnLetter:nth-child(6) {
+  animation-delay: 0.40s;
+}
+.btnLetter:nth-child(7),
+.btn:focus .btnLetter:nth-child(7) {
+  animation-delay: 0.48s;
+}
+.btnLetter:nth-child(8),
+.btn:focus .btnLetter:nth-child(8) {
+  animation-delay: 0.56s;
+}
+.btnLetter:nth-child(9),
+.btn:focus .btnLetter:nth-child(9) {
+  animation-delay: 0.64s;
+}
+.btnLetter:nth-child(10),
+.btn:focus .btnLetter:nth-child(10) {
+  animation-delay: 0.72s;
+}
+.btnLetter:nth-child(11),
+.btn:focus .btnLetter:nth-child(11) {
+  animation-delay: 0.80s;
+}
+.btnLetter:nth-child(12),
+.btn:focus .btnLetter:nth-child(12) {
+  animation-delay: 0.88s;
+}
+.btnLetter:nth-child(13),
+.btn:focus .btnLetter:nth-child(13) {
+  animation-delay: 0.96s;
+}
+
+/* Active state */
+.btn:active {
+  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 70%);
+  background-color: hsla(var(--highlight-color-hue), 50%, 20%, 0.5);
+}
+
+.btn:active::before {
+  box-shadow:
+    0 -8px 12px -6px #fffa inset,
+    0 -16px 16px -8px hsla(var(--highlight-color-hue), 100%, 70%, 80%) inset,
+    1px 1px 1px #fff4,
+    2px 2px 2px #fff2,
+    -1px -1px 1px #0002,
+    -2px -2px 2px #0001;
+}
+
+.btn:active::after {
+  opacity: 1;
+  mask-image: linear-gradient(0deg, #fff, transparent);
+  filter: brightness(200%);
+}
+
+.btn:active .btnLetter {
+  text-shadow: 0 0 1px hsla(var(--highlight-color-hue), 100%, 90%, 90%);
+  animation: none;
+}
+
+/* Hover state */
+.btn:hover {
+  border: solid 1px hsla(var(--highlight-color-hue), 100%, 80%, 40%);
+}
+
+.btn:hover::before {
+  box-shadow:
+    0 -8px 8px -6px #fffa inset,
+    0 -16px 16px -8px hsla(var(--highlight-color-hue), 100%, 70%, 30%) inset,
+    1px 1px 1px #fff2,
+    2px 2px 2px #fff1,
+    -1px -1px 1px #0002,
+    -2px -2px 2px #0001;
+}
+
+.btn:hover::after {
+  opacity: 1;
+  mask-image: linear-gradient(0deg, #fff, transparent);
+}
+
+.btn:hover .btnSvg {
+  fill: #fff;
+  filter: drop-shadow(0 0 3px hsl(var(--highlight-color-hue), 100%, 70%))
+    drop-shadow(0 -4px 6px #0009);
+  animation: none;
+}

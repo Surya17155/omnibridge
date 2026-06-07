@@ -1,0 +1,48 @@
+.section {
+  composes: card from global;
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  composes: section-title from global;
+  margin-bottom: var(--space-5);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.group {
+  composes: form-group from global;
+}
+
+.label {
+  composes: form-label from global;
+}
+
+.input {
+  composes: form-input from global;
+}
+
+.submitBtn {
+  composes: btn btn-primary from global;
+  padding: var(--space-2) var(--space-5);
+  height: 36px;
+  white-space: nowrap;
+}
+
+.error {
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 700px) {
+  .form {
+    grid-template-columns: 1fr;
+  }
+}

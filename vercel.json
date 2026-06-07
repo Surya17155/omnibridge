@@ -1,0 +1,12 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "build/client",
+  "devCommand": "npm run dev",
+  "functions": {
+    "api/index.js": {
+      "runtime": "nodejs@20.x"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/api/index" }]
+}

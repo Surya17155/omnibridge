@@ -1,0 +1,85 @@
+.section {
+  composes: card from global;
+  padding: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.title {
+  composes: section-title from global;
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  composes: section-subtitle from global;
+  margin-bottom: var(--space-5);
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.option {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.optionTitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.optionDesc {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  line-height: 1.5;
+}
+
+.textarea {
+  composes: form-input from global;
+  resize: vertical;
+  min-height: 100px;
+  font-family: var(--family-mono);
+  font-size: var(--text-xs);
+  margin-bottom: var(--space-3);
+}
+
+.fileUpload {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  cursor: pointer;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  transition: all 0.15s ease;
+  margin-bottom: var(--space-3);
+}
+
+.fileUpload:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.btn {
+  composes: btn btn-primary from global;
+  width: 100%;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .options {
+    grid-template-columns: 1fr;
+  }
+}

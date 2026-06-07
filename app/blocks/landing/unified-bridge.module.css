@@ -1,0 +1,111 @@
+.section {
+  position: relative;
+  width: 100%;
+  padding: var(--space-24, 96px) var(--space-6);
+  overflow: hidden;
+}
+
+.bloom {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 1100px;
+  height: 600px;
+  max-width: 150vw;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(7, 110, 255, 0.18), transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: var(--text-xs);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-family: var(--family-display);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin-bottom: var(--space-4);
+}
+
+.description {
+  max-width: 620px;
+  margin: 0 auto var(--space-12);
+  color: var(--color-text-secondary);
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+
+.marquee {
+  position: relative;
+  margin-top: var(--space-12);
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.track {
+  display: flex;
+  gap: var(--space-4);
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  backdrop-filter: blur(10px);
+  font-family: var(--family-display);
+  font-weight: 600;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% / 3));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    padding: var(--space-16) var(--space-6);
+  }
+  .track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+}

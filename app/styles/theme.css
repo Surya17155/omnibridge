@@ -1,0 +1,86 @@
+:root {
+  /* Colors - Primary (electric blue accent) */
+  --color-primary: #4FABFF;
+  --color-primary-hover: #2f93f5;
+  --color-primary-light: rgba(79, 171, 255, 0.12);
+  --color-primary-muted: #9fc8ff;
+
+  /* Colors - Secondary */
+  --color-secondary: #38bdf8;
+  --color-secondary-light: rgba(56, 189, 248, 0.12);
+
+  /* Brand gradient */
+  --gradient-accent: linear-gradient(90deg, #076EFF 0%, #4FABFF 50%, #38bdf8 100%);
+  --gradient-accent-soft: linear-gradient(135deg, rgba(7, 110, 255, 0.18), rgba(56, 189, 248, 0.06));
+
+  /* Colors - Status (translucent for dark surfaces) */
+  --color-success: #34d399;
+  --color-success-light: rgba(52, 211, 153, 0.14);
+  --color-warning: #fbbf24;
+  --color-warning-light: rgba(251, 191, 36, 0.14);
+  --color-danger: #f87171;
+  --color-danger-light: rgba(248, 113, 113, 0.14);
+  --color-info: #38bdf8;
+  --color-info-light: rgba(56, 189, 248, 0.14);
+
+  /* Colors - Neutral (dark canvas) */
+  --color-bg: #05060A;
+  --color-surface: rgba(255, 255, 255, 0.035);
+  --color-surface-raised: rgba(255, 255, 255, 0.06);
+  --color-surface-solid: #0c1018;
+  --color-border: rgba(255, 255, 255, 0.09);
+  --color-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Colors - Text */
+  --color-text: #F5F8FF;
+  --color-text-secondary: #b9c2db;
+  --color-text-muted: #7f89a6;
+  --color-text-inverted: #05060A;
+
+  /* Colors - Nav */
+  --color-nav-bg: rgba(8, 11, 20, 0.7);
+  --color-nav-text: #b9c2db;
+  --color-nav-active: #4FABFF;
+
+  /* Background bloom (radial blue light) */
+  --bg-bloom: radial-gradient(120% 80% at 50% -10%, #14246b 0%, #0a1130 38%, #05060A 72%);
+
+  /* Fonts */
+  --family-display: 'Sora', sans-serif;
+  --family-body: 'Space Grotesk', sans-serif;
+  --family-mono: 'Space Grotesk', monospace;
+
+  /* Font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 40px rgba(7, 110, 255, 0.35);
+  --shadow-glow-soft: 0 0 24px rgba(79, 171, 255, 0.22);
+}

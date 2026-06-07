@@ -1,0 +1,89 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-5);
+  margin-bottom: var(--space-8);
+}
+
+.statCard {
+  composes: card from global;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.iconWrap {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.iconWrap.primary {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.iconWrap.success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.iconWrap.warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.iconWrap.info {
+  background: var(--color-info-light);
+  color: var(--color-info);
+}
+
+.statusBadge {
+  composes: badge badge-success from global;
+}
+
+.statusBadgeWarning {
+  composes: badge badge-warning from global;
+}
+
+.value {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.sublabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,37 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.wrapper {
+  position: relative;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.text {
+  display: flex;
+  justify-content: center;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  background: linear-gradient(to right, rgb(10 10 10), rgb(163 163 163), rgb(10 10 10));
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  white-space: nowrap;
+  min-width: max-content;
+}
+
+:global(html.dark-theme) .text {
+  background: linear-gradient(to right, rgb(255 255 255), rgb(82 82 82), rgb(255 255 255));
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+}
