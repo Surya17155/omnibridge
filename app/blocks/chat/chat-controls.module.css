@@ -71,6 +71,14 @@
   border-color: var(--color-border-strong);
 }
 
+.modelBtnLabel {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -85,8 +93,8 @@
   list-style: none;
   margin: 0;
   padding: 4px;
-  min-width: 220px;
-  max-height: 320px;
+  min-width: 240px;
+  max-height: 380px;
   overflow-y: auto;
   background: var(--color-surface-solid);
   border: 1px solid var(--color-border);
@@ -95,14 +103,114 @@
   backdrop-filter: blur(20px);
 }
 
-.menuItem {
+.menuItemWrapper {
+  position: relative;
+}
+
+.menuItemWrapperWithSubs {
+  margin-bottom: 0;
+}
+
+.menuItemRow {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
   padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.menuItemRow:hover {
+  background: var(--color-surface-raised);
+}
+
+.menuItemActive {
+  background: var(--color-primary-light);
+  color: var(--color-primary-muted);
+}
+
+.menuItemActive:hover {
+  background: var(--color-primary-light);
+}
+
+.menuItemIcon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+.menuItemActive .menuItemIcon {
+  color: var(--color-primary-muted);
+}
+
+.menuItemLabel {
+  flex: 1;
   font-size: var(--text-sm);
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.expandBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.expandBtn:hover {
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+}
+
+.expandBtnOpen {
+  transform: rotate(90deg);
+}
+
+/* Sub-list styles */
+.subList {
+  list-style: none;
+  margin: 0 0 4px 0;
+  padding: 0 0 0 28px;
+  animation: slideDown 0.15s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+  }
+}
+
+.subItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 12px;
+  font-size: var(--text-sm);
+  font-weight: 400;
   color: var(--color-text);
   background: transparent;
   border: none;
@@ -113,18 +221,43 @@
   font-family: var(--family-body);
 }
 
-.menuItem:hover {
+.subItem:hover {
   background: var(--color-surface-raised);
 }
 
-.menuItemActive {
+.subItemActive {
   background: var(--color-primary-light);
   color: var(--color-primary-muted);
+  font-weight: 500;
 }
 
-.empty {
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-xs);
+.subItemInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.subItemLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subItemMeta {
+  font-size: 11px;
   color: var(--color-text-muted);
-  text-align: center;
+  font-weight: 400;
+}
+
+.freeBadge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-success);
+  background: rgba(16, 185, 129, 0.15);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
 }

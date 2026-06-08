@@ -62,8 +62,7 @@ export function AddKeyForm({ provider }: AddKeyFormProps) {
             className={styles.input}
             type="number"
             name="quotaTotal"
-            placeholder="1000"
-            defaultValue="1000"
+            placeholder="Leave blank for unlimited usage."
             min="1"
           />
         </div>

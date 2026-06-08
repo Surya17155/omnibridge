@@ -67,6 +67,15 @@ export const PROVIDER_BADGES: ProviderBadge[] = [
   { name: "GLM", color: "#FF6B35" },
   { name: "Kimi", color: "#6366F1" },
   { name: "Mistral", color: "#F59E0B" },
+  { name: "Nvidia", color: "#76B900" },
+  { name: "GitHub", color: "#333333" },
+  { name: "Cerebras", color: "#0055FF" },
+  { name: "OpenCode", color: "#8B5CF6" },
+  { name: "Cloudflare", color: "#F38020" },
+  { name: "Cohere", color: "#39594D" },
+  { name: "ZAI", color: "#FF6B35" },
+  { name: "Kilo", color: "#FF4B4B" },
+  { name: "Pollinations", color: "#E91E63" },
 ];
 
 export interface StepItem {
@@ -104,7 +113,7 @@ export interface StatItem {
 
 /** Headline numbers in the stats band. */
 export const STATS: StatItem[] = [
-  { value: "6+", label: "AI providers unified" },
+  { value: "16+", label: "AI providers unified" },
   { value: "99.9%", label: "Request success rate" },
   { value: "0ms", label: "Failover switch time" },
   { value: "1", label: "Key to rule them all" },

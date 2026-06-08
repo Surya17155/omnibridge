@@ -1,3 +1,4 @@
+import { useState, useCallback, useRef } from "react";
 import { useInView } from "~/hooks/use-in-view";
 import type { DailyUsagePoint } from "~/data/mock-data";
 import styles from "./trend-chart.module.css";
@@ -5,7 +6,7 @@ import styles from "./trend-chart.module.css";
 const VIEW_WIDTH = 560;
 const VIEW_HEIGHT = 180;
 const PAD_X = 12;
-const PAD_TOP = 16;
+const PAD_TOP = 24;
 const PAD_BOTTOM = 28;
 
 interface TrendChartProps {
@@ -35,9 +36,31 @@ function buildPath(data: DailyUsagePoint[], max: number) {
 
 export function TrendChart({ data }: TrendChartProps) {
   const { ref, inView } = useInView<HTMLDivElement>();
+  const [hovered, setHovered] = useState<number | null>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
   const max = Math.max(...data.map((d) => d.requests)) * 1.1;
   const { points, line, area } = buildPath(data, max);
   const peak = data.reduce((a, b) => (b.requests > a.requests ? b : a));
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<SVGSVGElement>) => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const mouseX = ((e.clientX - rect.left) / rect.width) * VIEW_WIDTH;
+
+    let nearest = 0;
+    let minDist = Infinity;
+    points.forEach((p, i) => {
+      const dist = Math.abs(p.x - mouseX);
+      if (dist < minDist) { minDist = dist; nearest = i; }
+    });
+    setHovered(nearest);
+  }, [points]);
+
+  const handleMouseLeave = useCallback(() => setHovered(null), []);
+
+  const tip = hovered !== null && data[hovered];
 
   return (
     <div ref={ref} className={styles.wrap}>
@@ -49,11 +72,15 @@ export function TrendChart({ data }: TrendChartProps) {
       </div>
 
       <svg
+        ref={svgRef}
         className={styles.svg}
         viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
         preserveAspectRatio="none"
         role="img"
         aria-label="Daily request volume over the last 7 days"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ cursor: hovered !== null ? "pointer" : "default" }}
       >
         <defs>
           <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
@@ -91,16 +118,59 @@ export function TrendChart({ data }: TrendChartProps) {
           className={`${styles.line} ${inView ? styles.lineVisible : ""}`}
         />
 
-        {points.map((p, i) => (
-          <circle
-            key={data[i].day}
-            cx={p.x}
-            cy={p.y}
-            r="3.5"
-            className={`${styles.dot} ${inView ? styles.dotVisible : ""}`}
-            style={{ transitionDelay: `${600 + i * 70}ms` }}
+        {hovered !== null && (
+          <line
+            x1={points[hovered].x}
+            x2={points[hovered].x}
+            y1={PAD_TOP - 6}
+            y2={VIEW_HEIGHT - PAD_BOTTOM}
+            className={styles.hoverLine}
           />
-        ))}
+        )}
+
+        {points.map((p, i) => {
+          const isHovered = hovered === i;
+          return (
+            <circle
+              key={data[i].day}
+              cx={p.x}
+              cy={p.y}
+              r={isHovered ? 7 : 4}
+              className={`${styles.dot} ${inView ? styles.dotVisible : ""} ${isHovered ? styles.dotActive : ""}`}
+              style={{
+                transitionDelay: isHovered ? "0ms" : `${600 + i * 70}ms`,
+                cursor: "pointer",
+              }}
+            />
+          );
+        })}
+
+        {hovered !== null && tip && (
+          <>
+            <circle
+              cx={points[hovered].x}
+              cy={points[hovered].y}
+              r="14"
+              className={styles.dotGlow}
+            />
+            <rect
+              x={points[hovered].x - 52}
+              y={PAD_TOP - 22}
+              width="104"
+              height="20"
+              rx="6"
+              className={styles.tooltipBg}
+            />
+            <text
+              x={points[hovered].x}
+              y={PAD_TOP - 8}
+              textAnchor="middle"
+              className={styles.tooltipText}
+            >
+              {tip.day} · {tip.requests.toLocaleString()}
+            </text>
+          </>
+        )}
       </svg>
 
       <div className={styles.axis}>

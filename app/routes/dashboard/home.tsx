@@ -43,7 +43,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     provider: k.provider as Provider,
     label: k.label,
     key: maskKey(k.key_value),
-    status: k.status === "active" ? "active" : k.status === "inactive" ? "inactive" : "quota-exceeded",
+    status: (k.status === "active" ? "active" : k.status === "inactive" ? "inactive" : "quota-exceeded") as "active" | "inactive" | "quota-exceeded",
     quotaRemaining: k.quota_remaining,
     quotaTotal: k.quota_total,
     lastUsed: k.last_used,
@@ -63,24 +63,24 @@ export default function DashboardHome() {
   return (
     <div className="page">
       <Reveal>
-        <header style={{ marginBottom: "var(--space-8)" }}>
-          <h1 className="page-title">Dashboard</h1>
-          <p className="page-subtitle">
+        <header style={{ marginBottom: "var(--space-10)" }}>
+          <h1 className="page-title" style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)" }}>Dashboard</h1>
+          <p className="page-subtitle" style={{ fontSize: "var(--text-lg)" }}>
             Live overview of your unified AI proxy — keys, usage, and system health at a glance.
           </p>
         </header>
       </Reveal>
-      <Reveal>
+      <Reveal delay={40}>
         <SystemStatusOverview {...systemStatus} hasOmniKey={hasOmniKey} />
       </Reveal>
-      <Reveal delay={80}>
+      <Reveal delay={60}>
         <UsageStatistics {...usageStats} />
       </Reveal>
-      <Reveal delay={120}>
-        <ActiveKeysSummary keys={activeKeys} />
-      </Reveal>
-      <Reveal delay={160}>
-        <QuickActions />
+      <Reveal delay={80}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-6)", alignItems: "flex-start" }}>
+          <ActiveKeysSummary keys={activeKeys} />
+          <QuickActions />
+        </div>
       </Reveal>
     </div>
   );

@@ -22,7 +22,7 @@ export function UnifiedBridge() {
             Many keys. <span className="gradient-text">One bridge.</span>
           </h2>
           <p className={styles.description}>
-            Gemini, Groq, DeepSeek, GLM, Kimi and more — OmniBridge merges every provider key into a single,
+            Gemini, Groq, Nvidia, GitHub, Cerebras, Cohere and more — OmniBridge merges every provider key into a single,
             intelligent, unified API stream.
           </p>
         </Reveal>

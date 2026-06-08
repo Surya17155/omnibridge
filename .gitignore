@@ -12,3 +12,28 @@
 
 # SQLite database
 /data/
+
+.vercel
+
+# Session notes & scratch files
+session*.md
+PROJECT_CONTEXT_PRD.md
+context.prd
+*.log
+
+# Agent caches & tool artifacts
+.agents/
+.playwright-mcp/
+graphify-out/
+dazl-prompts/
+dazl.addons.json
+dazl.config.json
+skills-lock.json
+
+# Local SQLite artifacts (Turso creates these next to the db)
+auth
+auth-wal
+
+# Temp / archives
+*.zip
+OmniBridge\ SaaS\ Video

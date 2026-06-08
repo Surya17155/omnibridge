@@ -15,6 +15,11 @@ export default defineConfig({
   resolve: {
     tsconfigPaths: true,
   },
+  define: {
+"process.env.OMNIBRIDGE_PUBLIC_BASE_URL": JSON.stringify(
+    process.env.OMNIBRIDGE_PUBLIC_BASE_URL ?? "https://omnibridge-dev.vercel.app/api/v1"
+  ),
+  },
   ssr: {
     external: ["@libsql/client", "bcryptjs", "node:crypto"],
   },

@@ -1,8 +1,11 @@
 import { callProvider, PROVIDER_DEFAULT_MODEL, type ChatMessage, type LlmResponse, type ProviderName } from "./llm.server";
 import { decideRouting, type RoutingDecision, type RoutingTarget } from "./routing.server";
-import { getProviderKeys, type ProviderKey } from "./auth.server";
+import { getProviderKeys, updateProviderKeyUsage, type ProviderKey } from "./auth.server";
+import { getProviderModels } from "~/data/provider-models";
 import { insertRequestLog } from "./usage.server";
 import { openaiErrorResponse } from "./proxy-auth.server";
+import { SYSTEM_PERSONA } from "./persona";
+import { buildCandidateKeys, isTransientUpstreamError } from "./key-picker.server";
 
 export type ProxyChatRequest = {
   model: string;
@@ -30,13 +33,14 @@ export type ProxyChatResponse = {
 };
 
 const PROVIDER_FROM_MODEL: Array<{ provider: ProviderName; match: RegExp }> = [
-  { provider: "Gemini", match: /gemini/i },
-  { provider: "OpenAI", match: /gpt|openai/i },
-  { provider: "DeepSeek", match: /deepseek/i },
+  { provider: "Gemini", match: /^gemini/i },
+  { provider: "OpenAI", match: /^gpt|^openai(?!\/)/i },
+  { provider: "DeepSeek", match: /^deepseek/i },
+  { provider: "Nvidia", match: /nvidia|nemotron/i },
   { provider: "Groq", match: /llama|groq|mixtral/i },
-  { provider: "Mistral", match: /mistral/i },
-  { provider: "GLM", match: /glm|chatglm/i },
-  { provider: "Kimi", match: /moonshot|kimi/i },
+  { provider: "Mistral", match: /^mistral/i },
+  { provider: "GLM", match: /^glm|^chatglm/i },
+  { provider: "Kimi", match: /^moonshot|^kimi/i },
   { provider: "OpenRouter", match: /openrouter/i },
 ];
 
@@ -51,12 +55,6 @@ function providerOfKey(k: ProviderKey): ProviderName {
   return k.provider as ProviderName;
 }
 
-function pickKeyFor(keys: ProviderKey[], provider: ProviderName): ProviderKey | null {
-  const candidates = keys.filter((k) => providerOfKey(k) === provider && k.status === "active");
-  if (candidates.length === 0) return null;
-  return candidates.reduce((best, k) => (k.quota_remaining > best.quota_remaining ? k : best));
-}
-
 function openaiCompletion(args: {
   id: string;
   created: number;
@@ -66,7 +64,9 @@ function openaiCompletion(args: {
   reason: string;
   responseTime: number;
   keyLabel: string;
-  tokens: number;
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
 }): ProxyChatResponse {
   return {
     id: args.id,
@@ -81,9 +81,9 @@ function openaiCompletion(args: {
       },
     ],
     usage: {
-      prompt_tokens: 0,
-      completion_tokens: args.tokens,
-      total_tokens: args.tokens,
+      prompt_tokens: args.promptTokens,
+      completion_tokens: args.completionTokens,
+      total_tokens: args.totalTokens,
     },
     x_omnibridge: {
       provider: args.provider,
@@ -145,111 +145,110 @@ export async function handleChatCompletion(userId: number, body: ProxyChatReques
     };
   }
 
-  const candidateOrder: ProviderName[] = [decision.target];
-  for (const p of available) {
-    if (!candidateOrder.includes(p)) candidateOrder.push(p);
+  const candidates = buildCandidateKeys(allKeys, decision.target, available);
+  if (candidates.length === 0) {
+    return {
+      ok: false,
+      response: openaiErrorResponse(400, "invalid_request_error", `No usable keys for ${decision.target} (or any other configured provider).`, "no_usable_keys"),
+    };
   }
 
-  const id = `chatcmpl-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  const id = `chatcmpl-${crypto.randomUUID()}`;
   const created = Math.floor(Date.now() / 1000);
 
-  let lastError: string | null = null;
-  for (const provider of candidateOrder) {
-    const key = pickKeyFor(allKeys, provider);
-    if (!key) continue;
+  let lastError: string | undefined;
+  for (const key of candidates) {
+    const provider = providerOfKey(key);
+    const providerModels = getProviderModels(provider);
+    const skippedModels = new Set<string>();
+    const initialModel = body.model && body.model !== "auto" ? body.model : decision.model;
+    let modelToTry = initialModel;
 
-    let response: LlmResponse;
-    try {
-      response = await callProvider(provider, key.key_value, body.messages);
-    } catch (e: any) {
-      lastError = e?.message || "Network error";
-      await insertRequestLog({
-        userId,
-        provider,
-        keyLabel: key.label,
-        model: PROVIDER_DEFAULT_MODEL[provider],
-        status: "error",
-        responseTime: 0,
-        tokens: 0,
-        endpoint,
-        errorMessage: lastError,
-      });
-      continue;
-    }
-
-    if (response.status >= 200 && response.status < 300) {
-      await insertRequestLog({
-        userId,
-        provider,
-        keyLabel: key.label,
-        model: response.model,
-        status: "success",
-        responseTime: response.responseTime,
-        tokens: response.tokens,
-        endpoint,
-      });
-      return {
-        ok: true,
-        status: 200,
-        response: openaiCompletion({
-          id,
-          created,
-          model: response.model,
-          content: response.text,
+    for (let attempt = 0; attempt <= providerModels.length; attempt++) {
+      let response: LlmResponse;
+      try {
+        response = await callProvider(provider, key.key_value, [
+          { role: "system", content: SYSTEM_PERSONA } as ChatMessage,
+          ...body.messages,
+        ], modelToTry);
+      } catch (e: any) {
+        lastError = e?.message || "Network error";
+        await insertRequestLog({
+          userId,
           provider,
-          reason: decision.reason,
-          responseTime: response.responseTime,
           keyLabel: key.label,
+          model: PROVIDER_DEFAULT_MODEL[provider],
+          status: "error",
+          responseTime: 0,
+          tokens: 0,
+          endpoint,
+          errorMessage: lastError,
+        });
+        if (!tryNextModel(providerModels, skippedModels, modelToTry)) break;
+        skippedModels.add(modelToTry ?? "");
+        modelToTry = providerModels.find((m) => !skippedModels.has(m.id))?.id;
+        continue;
+      }
+
+      if (response.status >= 200 && response.status < 300) {
+        await insertRequestLog({
+          userId,
+          provider,
+          keyLabel: key.label,
+          model: response.model,
+          status: "success",
+          responseTime: response.responseTime,
           tokens: response.tokens,
-        }),
-      };
-    }
+          endpoint,
+        });
+        if (response.tokens > 0) {
+          await updateProviderKeyUsage(key.id, userId, response.tokens);
+        }
+        return {
+          ok: true,
+          status: 200,
+          response: openaiCompletion({
+            id,
+            created,
+            model: response.model,
+            content: response.text,
+            provider,
+            reason: decision.reason,
+            responseTime: response.responseTime,
+            keyLabel: key.label,
+            promptTokens: response.promptTokens,
+            completionTokens: response.completionTokens,
+            totalTokens: response.tokens,
+          }),
+        };
+      }
 
-    const msg = (response.error || "").toLowerCase();
-    const looksLikeAuthFail =
-      response.rateLimited ||
-      response.status === 401 ||
-      response.status === 403 ||
-      (response.status >= 400 && response.status < 500 && (msg.includes("api key") || msg.includes("unauthorized") || msg.includes("authentication")));
-
-    if (looksLikeAuthFail) {
       await insertRequestLog({
         userId,
         provider,
         keyLabel: key.label,
         model: response.model,
-        status: response.rateLimited ? "rate-limited" : "error",
+        status: "error",
         responseTime: response.responseTime,
         tokens: 0,
         endpoint,
         errorMessage: response.error,
       });
-      lastError = response.rateLimited
-        ? `${provider} rate-limited: ${response.error}`
-        : `${provider} auth failed (${response.status}): ${response.error}`;
-      continue;
-    }
 
-    await insertRequestLog({
-      userId,
-      provider,
-      keyLabel: key.label,
-      model: response.model,
-      status: "error",
-      responseTime: response.responseTime,
-      tokens: 0,
-      endpoint,
-      errorMessage: response.error,
-    });
-    return {
-      ok: false,
-      response: openaiErrorResponse(
-        response.status || 502,
-        "upstream_error",
-        `${provider}: ${response.error || "request failed"}`,
-        "upstream_error"
-      ),
-    };
+      if (isTransientUpstreamError(response)) {
+        lastError = response.rateLimited
+          ? `${provider} rate-limited: ${response.error}`
+          : `${provider} failed (${response.status}): ${response.error}`;
+        break;
+      }
+
+      if (!tryNextModel(providerModels, skippedModels, modelToTry)) {
+        lastError = response.error || `${provider} request failed`;
+        break;
+      }
+      skippedModels.add(modelToTry ?? "");
+      modelToTry = providerModels.find((m) => !skippedModels.has(m.id))?.id;
+    }
   }
 
   return {
@@ -257,3 +256,13 @@ export async function handleChatCompletion(userId: number, body: ProxyChatReques
     response: openaiErrorResponse(502, "upstream_error", lastError || "All providers failed or rate-limited. Try again later.", "all_providers_failed"),
   };
 }
+
+function tryNextModel(
+  models: { id: string }[],
+  skipped: Set<string>,
+  current: string | undefined
+): boolean {
+  return models.some((m) => !skipped.has(m.id) && m.id !== current);
+}
+
+export type { RoutingTarget };

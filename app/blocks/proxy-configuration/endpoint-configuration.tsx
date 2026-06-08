@@ -2,11 +2,12 @@ import { useState } from "react";
 import { IconCopy, IconCheck } from "@tabler/icons-react";
 import styles from "./endpoint-configuration.module.css";
 
-const BASE_URL = "https://api.omnibridge.ai/v1";
+const DEFAULT_BASE_URL = "https://omnibridge-dev.vercel.app/api/v1";
+const BASE_URL =
+  (typeof window !== "undefined" && (window as any).__OMNIBRIDGE_BASE_URL__) || DEFAULT_BASE_URL;
 
 const ENDPOINTS = [
   { method: "POST", path: "/chat/completions" },
-  { method: "POST", path: "/embeddings" },
   { method: "GET", path: "/models" },
 ];
 

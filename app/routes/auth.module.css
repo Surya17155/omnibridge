@@ -32,8 +32,10 @@
   justify-content: center;
 }
 
-.logo svg {
-  color: var(--color-primary);
+.logoImg {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
 .title {

@@ -32,10 +32,12 @@
   justify-content: center;
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-sm);
-  background: var(--gradient-accent);
-  color: #fff;
-  box-shadow: var(--shadow-glow-soft);
+}
+
+.logoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .links {

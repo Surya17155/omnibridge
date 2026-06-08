@@ -60,7 +60,8 @@ export function ActiveKeysSummary({ keys }: Props) {
               <span className={styles.providerCount}>{list.length} key{list.length !== 1 ? "s" : ""}</span>
             </div>
             {list.map((key) => {
-              const pct = key.quotaTotal > 0 ? (key.quotaRemaining / key.quotaTotal) * 100 : 0;
+              const isUnlimited = key.quotaTotal === -1;
+              const pct = isUnlimited ? 100 : key.quotaTotal > 0 ? (key.quotaRemaining / key.quotaTotal) * 100 : 0;
               const { label, cls } = getStatusLabel(key.status);
               return (
                 <div key={key.id} className={styles.keyItem}>
@@ -69,10 +70,10 @@ export function ActiveKeysSummary({ keys }: Props) {
                   <div className={styles.quotaBar}>
                     <div
                       className={styles.quotaFill}
-                      style={{ width: `${pct}%`, background: getQuotaColor(pct) }}
+                      style={{ width: `${pct}%`, background: isUnlimited ? "var(--color-primary)" : getQuotaColor(pct) }}
                     />
                   </div>
-                  <span className={`${styles.statusBadge} ${cls}`}>{label}</span>
+                  <span className={`${styles.statusBadge} ${cls}`}>{isUnlimited ? "Unlimited" : label}</span>
                 </div>
               );
             })}

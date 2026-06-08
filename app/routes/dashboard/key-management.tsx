@@ -26,7 +26,9 @@ export async function action({ request }: ActionFunctionArgs) {
     const provider = formData.get("provider") as string;
     const label = formData.get("label") as string;
     const keyValue = formData.get("apiKey") as string;
-    const quotaTotal = parseInt(formData.get("quotaTotal") as string || "1000", 10);
+    const rawQuota = (formData.get("quotaTotal") as string | null)?.trim();
+    const parsedQuota = rawQuota ? parseInt(rawQuota, 10) : NaN;
+    const quotaTotal = Number.isFinite(parsedQuota) && parsedQuota > 0 ? parsedQuota : null;
 
     if (!provider || !keyValue) {
       return { error: "Provider and API key are required", status: 400 };

@@ -66,9 +66,10 @@ export function KeysList({ provider }: KeysListProps) {
           </thead>
           <tbody>
             {filteredKeys.map((key) => {
-              const pct = key.quota_total > 0 ? (key.quota_remaining / key.quota_total) * 100 : 0;
-              const displayKey = key.key_value.length > 12 
-                ? key.key_value.substring(0, 12) + "..." 
+              const isUnlimited = key.quota_total === -1;
+              const pct = isUnlimited ? 100 : key.quota_total > 0 ? (key.quota_remaining / key.quota_total) * 100 : 0;
+              const displayKey = key.key_value.length > 12
+                ? key.key_value.substring(0, 12) + "..."
                 : key.key_value;
               return (
                 <tr key={key.id}>
@@ -81,10 +82,12 @@ export function KeysList({ provider }: KeysListProps) {
                       <div className={styles.quotaBar}>
                         <div
                           className={styles.quotaFill}
-                          style={{ width: `${pct}%`, background: getQuotaColor(pct) }}
+                          style={{ width: `${pct}%`, background: isUnlimited ? "var(--color-primary)" : getQuotaColor(pct) }}
                         />
                       </div>
-                      <span className={styles.quotaText}>{key.quota_remaining}/{key.quota_total}</span>
+                      <span className={styles.quotaText}>
+                        {isUnlimited ? "Unlimited" : `${key.quota_remaining}/${key.quota_total}`}
+                      </span>
                     </div>
                   </td>
                   <td style={{ color: "var(--color-text-muted)" }}>{key.last_used || "Never"}</td>

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { IconBolt } from "@tabler/icons-react";
+
 import styles from "./landing-footer.module.css";
 
 const LINKS = [
@@ -16,7 +16,7 @@ export function LandingFooter() {
       <div className={styles.inner}>
         <Link to="/" className={styles.brand}>
           <span className={styles.logoIcon}>
-            <IconBolt size={16} />
+            <img src="/logo.png" alt="OmniBridge" className={styles.logoImg} />
           </span>
           OmniBridge AI
         </Link>

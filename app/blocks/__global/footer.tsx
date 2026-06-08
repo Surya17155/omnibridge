@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { IconBolt } from "@tabler/icons-react";
+
 import styles from "./footer.module.css";
 
 interface FooterProps {
@@ -14,7 +14,7 @@ export function Footer({ className }: FooterProps) {
           <div className={styles.brand}>
             <div className={styles.logo}>
               <div className={styles.logoIcon}>
-                <IconBolt size={18} color="white" />
+                <img src="/logo.png" alt="OmniBridge" className={styles.logoImg} />
               </div>
               OmniBridge AI
             </div>

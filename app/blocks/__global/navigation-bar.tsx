@@ -53,7 +53,7 @@ export function NavigationBar({ className, user }: NavigationBarProps) {
     <nav className={classnames(styles.nav, className)}>
       <NavLink to="/" className={styles.logo}>
         <div className={styles.logoIcon}>
-          <IconBolt size={20} />
+          <img src="/logo.png" alt="OmniBridge" className={styles.logoImg} />
         </div>
         <span className={styles.logoText}>
           Omni<span className={styles.logoAccent}>Bridge</span>

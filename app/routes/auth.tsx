@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { ActionFunctionArgs } from "react-router";
 import { Form, useActionData, useNavigation, redirect } from "react-router";
-import { IconBolt, IconMail, IconLock, IconEye, IconEyeOff } from "@tabler/icons-react";
+import { IconMail, IconLock, IconEye, IconEyeOff } from "@tabler/icons-react";
 import { createUser, getUserByEmail, verifyPassword, createSession } from "~/services/auth.server";
 import styles from "./auth.module.css";
 
@@ -61,7 +61,7 @@ export default function AuthPage() {
     <div className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <IconBolt size={28} />
+          <img src="/logo.png" alt="OmniBridge" className={styles.logoImg} />
           OmniBridge
         </div>
         <h1 className={styles.title}>

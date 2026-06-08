@@ -67,7 +67,7 @@ export async function getRequestLogs(
   const rows = await db.prepare(
     `SELECT * FROM request_logs WHERE ${conditions.join(" AND ")} ORDER BY timestamp DESC LIMIT ? OFFSET ?`
   ).all(...params);
-  return rows as RequestLog[];
+  return rows as unknown as RequestLog[];
 }
 
 export async function countRequestLogs(
@@ -113,7 +113,7 @@ export async function getUsageStats(userId: number): Promise<UsageStats> {
      FROM request_logs WHERE user_id = ?
      GROUP BY provider
      ORDER BY requests DESC`
-  ).all(userId) as Array<{ provider: string; requests: number }>;
+  ).all(userId) as unknown as Array<{ provider: string; requests: number }>;
 
   const byDay = await db.prepare(
     `SELECT
@@ -126,7 +126,7 @@ export async function getUsageStats(userId: number): Promise<UsageStats> {
      WHERE user_id = ? AND timestamp >= datetime('now', '-7 days')
      GROUP BY dow
      ORDER BY dow`
-  ).all(userId) as Array<{ dow: string; requests: number; successRate: number }>;
+  ).all(userId) as unknown as Array<{ dow: string; requests: number; successRate: number }>;
 
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const dayMap = new Map(byDay.map((d) => [d.dow, d]));

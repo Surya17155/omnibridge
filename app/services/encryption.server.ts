@@ -4,20 +4,31 @@ const ALGO = "aes-256-gcm";
 const IV_BYTES = 12;
 const KEY_BYTES = 32;
 
+let cachedKey: Buffer | null = null;
+
 function getKey(): Buffer {
+  if (cachedKey) return cachedKey;
   const raw = process.env.ENCRYPTION_KEY;
   if (!raw) {
     throw new Error(
       "ENCRYPTION_KEY env var is required. Generate one with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\""
     );
   }
-  let key: Buffer;
   if (/^[0-9a-fA-F]+$/.test(raw) && raw.length === KEY_BYTES * 2) {
-    key = Buffer.from(raw, "hex");
+    cachedKey = Buffer.from(raw, "hex");
   } else {
-    key = crypto.scryptSync(raw, "omnibridge-salt", KEY_BYTES);
+    cachedKey = crypto.scryptSync(raw, "omnibridge-salt", KEY_BYTES);
   }
-  return key;
+  return cachedKey;
+}
+
+export function hashKey(plaintext: string): string {
+  return crypto.createHash("sha256").update(plaintext, "utf8").digest("hex");
+}
+
+export function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(a, "hex"), Buffer.from(b, "hex"));
 }
 
 export function encryptKey(plaintext: string): string {

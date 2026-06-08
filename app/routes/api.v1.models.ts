@@ -2,30 +2,53 @@ import type { LoaderFunctionArgs } from "react-router";
 import { authenticateOmniKey, openaiErrorResponse } from "~/services/proxy-auth.server";
 import { getProviderKeys } from "~/services/auth.server";
 import { PROVIDER_DEFAULT_MODEL } from "~/services/llm.server";
+import { fetchNvidiaModels } from "~/services/nvidia.server";
 
 const MODEL_TO_PROVIDER: Record<string, string> = Object.fromEntries(
   Object.entries(PROVIDER_DEFAULT_MODEL).map(([provider, model]) => [model, provider])
 );
 
-const ALL_MODELS = [
-  { id: "auto", owned_by: "omnibridge" },
-  { id: "gemini-2.0-flash", owned_by: "google" },
-  { id: "gpt-4o-mini", owned_by: "openai" },
-  { id: "deepseek-chat", owned_by: "deepseek" },
-  { id: "llama-3.1-8b-instant", owned_by: "groq" },
-  { id: "mistral-small-latest", owned_by: "mistral" },
-  { id: "glm-4-flash", owned_by: "zhipu" },
-  { id: "moonshot-v1-8k", owned_by: "moonshot" },
+function modelEntry(id: string, owned_by: string) {
+  return { id, object: "model", owned_by };
+}
+
+const STATIC_MODELS = [
+  modelEntry("auto", "omnibridge"),
+  modelEntry("gemini-2.0-flash", "google"),
+  modelEntry("gpt-4o-mini", "openai"),
+  modelEntry("deepseek-chat", "deepseek"),
+  modelEntry("llama-3.1-8b-instant", "groq"),
+  modelEntry("mistral-small-latest", "mistral"),
+  modelEntry("glm-4-flash", "zhipu"),
+  modelEntry("moonshot-v1-8k", "moonshot"),
+  modelEntry("openai/gpt-4o-mini", "openrouter"),
+  modelEntry("meta/llama-3.1-8b-instruct", "nvidia"),
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const auth = authenticateOmniKey(request);
+  const auth = await authenticateOmniKey(request);
   if (!auth.ok) {
     return openaiErrorResponse(auth.status, "auth_error", auth.error.message, auth.error.type);
   }
 
-  const userProviders = new Set(getProviderKeys(auth.user.id).map((k) => k.provider));
-  const data = ALL_MODELS.filter((m) => m.id === "auto" || userProviders.has(MODEL_TO_PROVIDER[m.id] ?? ""));
+  const providerKeys = await getProviderKeys(auth.user.id);
+  const userProviders = new Set(providerKeys.map((k) => k.provider));
+
+  const allModels = [...STATIC_MODELS];
+
+  const nvidiaKey = providerKeys.find((k) => k.provider === "Nvidia")?.key_value;
+  if (nvidiaKey) {
+    const dynamic = await fetchNvidiaModels(nvidiaKey);
+    for (const m of dynamic) {
+      if (!allModels.some((e) => e.id === m.id)) {
+        allModels.push(modelEntry(m.id, "nvidia"));
+      }
+    }
+  }
+
+  const data = allModels.filter(
+    (m) => m.id === "auto" || userProviders.has(MODEL_TO_PROVIDER[m.id] ?? "Nvidia")
+  );
 
   return new Response(JSON.stringify({ object: "list", data }), {
     status: 200,

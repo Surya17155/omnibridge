@@ -74,6 +74,7 @@ await db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL REFERENCES users(id),
     key_value TEXT NOT NULL UNIQUE,
+    key_hash TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -113,4 +114,11 @@ try {
     await db.prepare("INSERT INTO user_settings (user_id) SELECT id FROM users").run();
   }
 } catch {
+}
+
+try {
+  await db.prepare("ALTER TABLE omni_keys ADD COLUMN key_hash TEXT").run();
+  await db.prepare("CREATE INDEX IF NOT EXISTS idx_omni_keys_hash ON omni_keys (key_hash)").run();
+} catch {
+  // Column already exists — fine.
 }

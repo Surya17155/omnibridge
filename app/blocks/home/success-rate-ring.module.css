@@ -1,0 +1,61 @@
+.wrap {
+  composes: card from global;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.title {
+  font-family: var(--family-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  align-self: flex-start;
+}
+
+.ringWrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.svg {
+  width: 200px;
+  height: 200px;
+}
+
+.ring {
+  transition: stroke-dashoffset 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rateValue {
+  font-family: var(--family-display);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.rateSub {
+  margin-top: 4px;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring {
+    transition: none;
+  }
+}

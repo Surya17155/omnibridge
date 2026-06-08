@@ -1,4 +1,5 @@
 import { IconUser, IconRobot, IconAlertTriangle, IconSparkles } from "@tabler/icons-react";
+import { MarkdownContent } from "./markdown";
 import styles from "./chat-message.module.css";
 
 export type MessageProps = {
@@ -7,10 +8,11 @@ export type MessageProps = {
   imageDataUrl?: string;
   routedTo?: string;
   routingReason?: string;
+  model?: string;
   isError?: boolean;
 };
 
-export function ChatMessage({ role, content, imageDataUrl, routedTo, routingReason, isError }: MessageProps) {
+export function ChatMessage({ role, content, imageDataUrl, routedTo, routingReason, model, isError }: MessageProps) {
   const isUser = role === "user";
 
   return (
@@ -26,13 +28,17 @@ export function ChatMessage({ role, content, imageDataUrl, routedTo, routingReas
           <p className={styles.errorText}>
             <IconAlertTriangle size={14} /> {content}
           </p>
-        ) : (
+        ) : isUser ? (
           content && <p className={styles.text}>{content}</p>
+        ) : (
+          content && <MarkdownContent text={content} />
         )}
-        {routedTo && role === "assistant" && !isError && (
+        {role === "assistant" && !isError && routedTo && (
           <p className={styles.meta}>
-            <IconSparkles size={12} /> Routed to <strong>{routedTo}</strong>
-            {routingReason ? ` — ${routingReason}` : ""}
+            <IconSparkles size={12} />
+            <strong>{routedTo}</strong>
+            {model && !model.startsWith("__") ? ` · ${model}` : ""}
+            {routingReason ? ` · ${routingReason}` : ""}
           </p>
         )}
       </div>

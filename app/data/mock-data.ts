@@ -1,4 +1,4 @@
-export type Provider = "Gemini" | "DeepSeek" | "GLM" | "Kimi" | "Groq" | "Mistral" | "OpenRouter";
+export type Provider = "Gemini" | "DeepSeek" | "GLM" | "Kimi" | "Groq" | "Mistral" | "OpenRouter" | "Nvidia" | "GitHub" | "Cerebras" | "OpenCode" | "Cloudflare" | "Cohere" | "ZAI" | "Kilo" | "Pollinations";
 
 export type KeyStatus = "active" | "inactive" | "quota-exceeded";
 
@@ -26,7 +26,7 @@ export interface LogEntry {
   endpoint: string;
 }
 
-export const PROVIDERS: Provider[] = ["Gemini", "DeepSeek", "GLM", "Kimi", "Groq", "Mistral", "OpenRouter"];
+export const PROVIDERS: Provider[] = ["Gemini", "DeepSeek", "GLM", "Kimi", "Groq", "Mistral", "OpenRouter", "Nvidia", "GitHub", "Cerebras", "OpenCode", "Cloudflare", "Cohere", "ZAI", "Kilo", "Pollinations"];
 
 export const PROVIDER_COLORS: Record<Provider, string> = {
   Gemini: "#4285F4",
@@ -36,6 +36,15 @@ export const PROVIDER_COLORS: Record<Provider, string> = {
   Groq: "#22C55E",
   Mistral: "#F59E0B",
   OpenRouter: "#FF6B6B",
+  Nvidia: "#76B900",
+  GitHub: "#333333",
+  Cerebras: "#0055FF",
+  OpenCode: "#8B5CF6",
+  Cloudflare: "#F38020",
+  Cohere: "#39594D",
+  ZAI: "#FF6B35",
+  Kilo: "#FF4B4B",
+  Pollinations: "#E91E63",
 };
 
 export const MOCK_KEYS: ApiKey[] = [

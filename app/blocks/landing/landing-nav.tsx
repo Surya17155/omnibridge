@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import classnames from "classnames";
-import { IconBolt } from "@tabler/icons-react";
 import styles from "./landing-nav.module.css";
 
 const LINKS = [
@@ -26,7 +25,7 @@ export function LandingNav() {
       <nav className={classnames(styles.nav, { [styles.scrolled]: scrolled })}>
         <Link to="/" className={styles.logo}>
           <span className={styles.logoIcon}>
-            <IconBolt size={18} />
+            <img src="/logo.png" alt="OmniBridge" className={styles.logoImg} />
           </span>
           Omni<span className={styles.logoAccent}>Bridge</span>
         </Link>

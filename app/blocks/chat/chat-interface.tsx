@@ -13,6 +13,7 @@ export type DisplayMessage = {
   imageDataUrl?: string;
   routedTo?: string;
   routingReason?: string;
+  model?: string;
   isError?: boolean;
   pending?: boolean;
 };
@@ -39,6 +40,7 @@ export function ChatInterface({
     reply?: string;
     routedTo?: string;
     routingReason?: string;
+    model?: string;
     error?: string;
   }>();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,6 +60,7 @@ export function ChatInterface({
               content: data.error,
               routedTo: data.routedTo,
               routingReason: data.routingReason,
+              model: data.model,
               isError: true,
             },
           ];
@@ -70,6 +73,7 @@ export function ChatInterface({
             content: data.reply || "",
             routedTo: data.routedTo,
             routingReason: data.routingReason,
+            model: data.model,
           },
         ];
       });

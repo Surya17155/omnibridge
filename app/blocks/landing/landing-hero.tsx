@@ -53,7 +53,7 @@ export function LandingHero() {
         </motion.h1>
 
         <motion.p className={styles.heroSub} variants={item}>
-          Gemini, Groq, DeepSeek, GLM, Kimi and more — behind a single unified API key.
+          Gemini, Groq, Nvidia, GitHub, Cerebras, Cohere and more — behind a single unified API key.
         </motion.p>
 
         <motion.div className={styles.heroActions} variants={item}>

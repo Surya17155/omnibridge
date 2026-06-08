@@ -4,12 +4,16 @@ import styles from "./integration-guide.module.css";
 
 const TABS = ["Python", "JavaScript", "cURL", "LangChain"];
 
+const DEFAULT_BASE_URL = "https://omnibridge-dev.vercel.app/api/v1";
+const BASE_URL =
+  (typeof window !== "undefined" && (window as any).__OMNIBRIDGE_BASE_URL__) || DEFAULT_BASE_URL;
+
 const CODE: Record<string, string> = {
   Python: `from openai import OpenAI
 
 client = OpenAI(
     api_key="obai_sk_live_YOUR_KEY",
-    base_url="https://api.omnibridge.ai/v1"
+    base_url="${BASE_URL}"
 )
 
 response = client.chat.completions.create(
@@ -21,7 +25,7 @@ print(response.choices[0].message.content)`,
 
 const client = new OpenAI({
   apiKey: "obai_sk_live_YOUR_KEY",
-  baseURL: "https://api.omnibridge.ai/v1",
+  baseURL: "${BASE_URL}",
 });
 
 const response = await client.chat.completions.create({
@@ -29,7 +33,7 @@ const response = await client.chat.completions.create({
   messages: [{ role: "user", content: "Hello!" }],
 });
 console.log(response.choices[0].message.content);`,
-  cURL: `curl https://api.omnibridge.ai/v1/chat/completions \\
+  cURL: `curl ${BASE_URL}/chat/completions \\
   -H "Content-Type: application/json" \\
   -H "Authorization: Bearer obai_sk_live_YOUR_KEY" \\
   -d '{
@@ -41,7 +45,7 @@ console.log(response.choices[0].message.content);`,
 llm = ChatOpenAI(
     model="auto",
     openai_api_key="obai_sk_live_YOUR_KEY",
-    openai_api_base="https://api.omnibridge.ai/v1"
+    openai_api_base="${BASE_URL}"
 )
 
 result = llm.invoke("Hello!")
@@ -73,7 +77,7 @@ export function IntegrationGuide() {
           <div className={styles.stepNum}>2</div>
           <div className={styles.stepContent}>
             <div className={styles.stepTitle}>Set the base URL in your client</div>
-            <code className={styles.inlineCode}>https://api.omnibridge.ai/v1</code>
+            <code className={styles.inlineCode}>{BASE_URL}</code>
           </div>
         </div>
         <div className={styles.step}>
