@@ -2,8 +2,13 @@ import { useState } from "react";
 import type { ActionFunctionArgs } from "react-router";
 import { Form, useActionData, useNavigation, redirect } from "react-router";
 import { IconMail, IconLock, IconEye, IconEyeOff } from "@tabler/icons-react";
-import { createUser, getUserByEmail, verifyPassword, createSession } from "~/services/auth.server";
+import { createUser, getUserByEmail, verifyPassword, createSession, SESSION_EXPIRY_DAYS } from "~/services/auth.server";
 import styles from "./auth.module.css";
+
+function sessionCookie(sessionId: string, request: Request): string {
+  const secure = request.url.startsWith("https") ? "; Secure" : "";
+  return `omnibridge-session=${sessionId}; Path=/; HttpOnly${secure}; SameSite=Lax; Max-Age=${SESSION_EXPIRY_DAYS * 24 * 60 * 60}`;
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
@@ -28,9 +33,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
     const sessionId = await createSession(user.id);
     return redirect("/dashboard", {
-      headers: {
-        "Set-Cookie": `omnibridge-session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`,
-      },
+      headers: { "Set-Cookie": sessionCookie(sessionId, request) },
     });
   }
 
@@ -41,9 +44,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
     const sessionId = await createSession(user.id);
     return redirect("/dashboard", {
-      headers: {
-        "Set-Cookie": `omnibridge-session=${sessionId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`,
-      },
+      headers: { "Set-Cookie": sessionCookie(sessionId, request) },
     });
   }
 

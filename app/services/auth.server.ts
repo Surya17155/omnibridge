@@ -31,7 +31,7 @@ export interface OmniKey {
   created_at: string;
 }
 
-const SESSION_EXPIRY_DAYS = 7;
+export const SESSION_EXPIRY_DAYS = 365;
 
 export function hashPassword(password: string): string {
   return bcrypt.hashSync(password, 10);
