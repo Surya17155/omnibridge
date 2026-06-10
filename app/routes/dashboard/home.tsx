@@ -64,7 +64,7 @@ function maskKey(value: string): string {
 }
 
 export default function DashboardHome() {
-  const { usageStats, systemStatus, activeKeys, hasOmniKey } = useLoaderData<typeof loader>();
+  const { usageStats, systemStatus, activeKeys, hasOmniKey, availableProviders, filterDays, filterProvider } = useLoaderData<typeof loader>();
   return (
     <div className="page">
       <Reveal>
@@ -79,7 +79,7 @@ export default function DashboardHome() {
         <SystemStatusOverview {...systemStatus} hasOmniKey={hasOmniKey} />
       </Reveal>
       <Reveal delay={60}>
-        <UsageStatistics {...usageStats} />
+        <UsageStatistics {...usageStats} availableProviders={availableProviders} filterDays={filterDays} filterProvider={filterProvider} />
       </Reveal>
       <Reveal delay={80}>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-6)", alignItems: "flex-start" }}>

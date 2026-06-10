@@ -144,11 +144,7 @@ export async function getUsageStats(userId: number, options: { days?: number; pr
      ORDER BY day`
   ).all(...dayParams) as unknown as Array<{ day: string; requests: number; successRate: number }>;
 
-  const requestsByDay: UsageStats["requestsByDay"] = byDay.map((r) => ({
-    day: formatDayLabel(r.day),
-    requests: r.requests,
-    successRate: r.successRate,
-  }));
+  const requestsByDay = fillMissingDays(byDay, days);
 
   return {
     totalRequests: totals.total,
@@ -158,6 +154,29 @@ export async function getUsageStats(userId: number, options: { days?: number; pr
     requestsByDay,
     avgResponseTime: totals.avgRt,
   };
+}
+
+function fillMissingDays(
+  rows: Array<{ day: string; requests: number; successRate: number }>,
+  numDays: number
+): Array<{ day: string; requests: number; successRate: number }> {
+  const map = new Map<string, { requests: number; successRate: number }>();
+  for (const r of rows) map.set(r.day, { requests: r.requests, successRate: r.successRate });
+
+  const result: Array<{ day: string; requests: number; successRate: number }> = [];
+  const now = new Date();
+  for (let i = numDays - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    const existing = map.get(key);
+    result.push({
+      day: formatDayLabel(key),
+      requests: existing?.requests ?? 0,
+      successRate: existing?.successRate ?? 0,
+    });
+  }
+  return result;
 }
 
 function formatDayLabel(dateStr: string): string {
