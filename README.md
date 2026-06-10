@@ -84,7 +84,7 @@ OmniBridge exposes an OpenAI-compatible API at `/api/v1`. Use it with any OpenAI
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://your-app.vercel.app/api/v1",
+    base_url="https://omnibridge-dev.vercel.app/api/v1",
     api_key="your-omnibridge-key"
 )
 ```
