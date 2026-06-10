@@ -1,4 +1,4 @@
-import { callProvider, PROVIDER_DEFAULT_MODEL, type ChatMessage, type LlmResponse, type ProviderName } from "./llm.server";
+import { callProvider, callProviderStream, PROVIDER_DEFAULT_MODEL, type ChatMessage, type LlmResponse, type ProviderName } from "./llm.server";
 import { decideRouting, type RoutingDecision, type RoutingTarget } from "./routing.server";
 import { getProviderKeys, updateProviderKeyUsage, type ProviderKey } from "./auth.server";
 import { getProviderModels } from "~/data/provider-models";
@@ -98,17 +98,177 @@ export type ProxyResult =
   | { ok: true; response: ProxyChatResponse; status: 200 }
   | { ok: false; response: Response };
 
-export async function handleChatCompletion(userId: number, body: ProxyChatRequest, endpoint: string): Promise<ProxyResult> {
+async function streamFromUpstream(args: {
+  userId: number;
+  body: ProxyChatRequest;
+  endpoint: string;
+  decision: RoutingDecision;
+  candidates: ProviderKey[];
+  id: string;
+  created: number;
+}): Promise<Response> {
+  const { userId, body, endpoint, decision, candidates, id, created } = args;
+  const encoder = new TextEncoder();
+
+  const attemptStream = async (key: ProviderKey): Promise<Response | null> => {
+    const provider = providerOfKey(key);
+    const providerModels = getProviderModels(provider);
+    const skippedModels = new Set<string>();
+    const initialModel = body.model && body.model !== "auto" ? body.model : decision.model;
+    let modelToTry = initialModel;
+
+    for (let attempt = 0; attempt <= providerModels.length; attempt++) {
+      const result = await callProviderStream(provider, key.key_value, [
+        { role: "system", content: SYSTEM_PERSONA } as ChatMessage,
+        ...body.messages,
+      ], modelToTry);
+
+      if (result.ok) {
+        const startMs = Date.now();
+        const body = result.response.body;
+        if (!body) return null;
+        const upstreamReader = body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let totalContent = "";
+
+        const webStream = new ReadableStream({
+          async start(controller) {
+            try {
+              while (true) {
+                const { done, value } = await upstreamReader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop() || "";
+                for (const line of lines) {
+                  if (!line.startsWith("data: ")) continue;
+                  const jsonStr = line.slice(6).trim();
+                  if (jsonStr === "[DONE]") continue;
+                  let data: any;
+                  try {
+                    data = JSON.parse(jsonStr);
+                  } catch {
+                    continue;
+                  }
+                  const choice = data?.choices?.[0];
+                  if (choice) {
+                    const delta = choice?.delta?.content || "";
+                    totalContent += delta;
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                      id,
+                      object: "chat.completion.chunk",
+                      created,
+                      model: result.model,
+                      choices: [{
+                        index: 0,
+                        delta: delta ? { content: delta } : {},
+                        finish_reason: choice?.finish_reason || null,
+                      }],
+                    })}\n\n`));
+                  } else if (data?.candidates?.[0]?.content?.parts) {
+                    const text = data.candidates[0].content.parts.map((p: any) => p.text).join("");
+                    if (text) {
+                      totalContent += text;
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                        id,
+                        object: "chat.completion.chunk",
+                        created,
+                        model: result.model,
+                        choices: [{
+                          index: 0,
+                          delta: { content: text },
+                          finish_reason: null,
+                        }],
+                      })}\n\n`));
+                    }
+                  }
+                }
+              }
+            } catch (e: any) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                id,
+                object: "chat.completion.chunk",
+                created,
+                model: result.model,
+                choices: [{
+                  index: 0,
+                  delta: {},
+                  finish_reason: "stop",
+                }],
+              })}\n\n`));
+            }
+
+            const responseTime = Date.now() - startMs;
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+              id,
+              object: "chat.completion.chunk",
+              created,
+              model: result.model,
+              choices: [{
+                index: 0,
+                delta: {},
+                finish_reason: "stop",
+              }],
+              usage: { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+              x_omnibridge: {
+                provider: result.provider,
+                routing_reason: decision.reason,
+                response_time_ms: responseTime,
+                key_label: key.label,
+              },
+            })}\n\n`));
+            controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+            controller.close();
+          },
+        });
+
+        return new Response(webStream, {
+          status: 200,
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            Connection: "keep-alive",
+          },
+        });
+      }
+
+      const err = result.error;
+      await insertRequestLog({
+        userId,
+        provider,
+        keyLabel: key.label,
+        model: PROVIDER_DEFAULT_MODEL[provider],
+        status: "error",
+        responseTime: 0,
+        tokens: 0,
+        endpoint,
+        errorMessage: err.error || "Stream error",
+      });
+      if (!tryNextModel(providerModels, skippedModels, modelToTry)) break;
+      skippedModels.add(modelToTry ?? "");
+      modelToTry = providerModels.find((m) => !skippedModels.has(m.id))?.id;
+    }
+    return null;
+  };
+
+  for (const key of candidates) {
+    const result = await attemptStream(key);
+    if (result) return result;
+  }
+
+  const errorResp = openaiErrorResponse(502, "upstream_error", "All providers failed during streaming. Try again later.", "all_providers_failed");
+  return new Response(JSON.stringify(errorResp), {
+    status: 502,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+export async function handleChatCompletion(userId: number, body: ProxyChatRequest, endpoint: string): Promise<ProxyResult | Response> {
   if (!body?.messages || !Array.isArray(body.messages) || body.messages.length === 0) {
     return {
       ok: false,
       response: openaiErrorResponse(400, "invalid_request_error", "messages array is required and must be non-empty", "missing_messages"),
-    };
-  }
-  if (body.stream) {
-    return {
-      ok: false,
-      response: openaiErrorResponse(501, "invalid_request_error", "Streaming is not yet supported. Set stream:false", "stream_unsupported"),
     };
   }
 
@@ -155,6 +315,10 @@ export async function handleChatCompletion(userId: number, body: ProxyChatReques
 
   const id = `chatcmpl-${crypto.randomUUID()}`;
   const created = Math.floor(Date.now() / 1000);
+
+  if (body.stream) {
+    return streamFromUpstream({ userId, body, endpoint, decision, candidates, id, created });
+  }
 
   let lastError: string | undefined;
   for (const key of candidates) {

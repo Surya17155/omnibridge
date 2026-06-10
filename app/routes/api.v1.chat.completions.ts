@@ -21,6 +21,10 @@ export async function action({ request }: ActionFunctionArgs) {
 
   const result = await handleChatCompletion(auth.user.id, body, "/api/v1/chat/completions");
 
+  if (result instanceof Response) {
+    return result;
+  }
+
   if (!result.ok) {
     return result.response;
   }

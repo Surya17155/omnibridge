@@ -441,6 +441,39 @@ function mergeSystemIntoUser(messages: { role: string; content: string }[]) {
   messages.splice(sysIdx, 1);
 }
 
+export async function callOpenAICompatStream(
+  apiKey: string,
+  messages: ChatMessage[],
+  baseUrl: string,
+  model: string,
+  provider: ProviderName
+): Promise<{ response: Response; model: string } | { error: LlmResponse }> {
+  const start = Date.now();
+  let res: Response;
+  try {
+    res = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
+        max_tokens: 16384,
+        stream: true,
+      }),
+    });
+  } catch (e: any) {
+    return { error: empty(provider, model, e?.message || "Network error", 0, Date.now() - start) };
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    return { error: empty(provider, model, data?.error?.message || `HTTP ${res.status}`, res.status, Date.now() - start, res.status === 429) };
+  }
+  return { response: res, model };
+}
+
 async function callOpenAICompat(
   apiKey: string,
   messages: ChatMessage[],
@@ -594,6 +627,88 @@ export async function callProvider(
     case "Kilo": return callKilo(apiKey, messages, model);
     case "Pollinations": return callPollinations(apiKey, messages, model);
   }
+}
+
+const STREAM_PROVIDER_CONFIG: Record<ProviderName, { baseUrl: string } | null> = {
+  Gemini: null,
+  DeepSeek: { baseUrl: "https://api.deepseek.com/v1" },
+  Groq: { baseUrl: "https://api.groq.com/openai/v1" },
+  Mistral: { baseUrl: "https://api.mistral.ai/v1" },
+  OpenAI: { baseUrl: "https://api.openai.com/v1" },
+  GLM: { baseUrl: "https://open.bigmodel.cn/api/paas/v4" },
+  Kimi: { baseUrl: "https://api.moonshot.cn/v1" },
+  OpenRouter: { baseUrl: "https://openrouter.ai/api/v1" },
+  Nvidia: { baseUrl: "https://integrate.api.nvidia.com/v1" },
+  GitHub: { baseUrl: "https://models.inference.ai.azure.com" },
+  Cerebras: { baseUrl: "https://api.cerebras.ai/v1" },
+  OpenCode: { baseUrl: "https://api.opencode.ai/v1" },
+  Cloudflare: null,
+  Cohere: null,
+  ZAI: { baseUrl: "https://api.z.ai/v1" },
+  Kilo: { baseUrl: "https://api.kilo.chat/v1" },
+  Pollinations: { baseUrl: "https://text.pollinations.ai/openai" },
+};
+
+export type LlmStreamResult =
+  | { ok: true; response: Response; provider: ProviderName; model: string }
+  | { ok: false; error: LlmResponse };
+
+export async function callProviderStream(
+  provider: ProviderName,
+  apiKey: string,
+  messages: ChatMessage[],
+  model?: string
+): Promise<LlmStreamResult> {
+  const m = model ?? PROVIDER_DEFAULT_MODEL[provider];
+  const cfg = STREAM_PROVIDER_CONFIG[provider];
+
+  if (cfg) {
+    const result = await callOpenAICompatStream(apiKey, messages, cfg.baseUrl, m, provider);
+    if ("error" in result) {
+      const err = result.error;
+      return { ok: false, error: err };
+    }
+    return { ok: true, response: result.response, provider, model: result.model };
+  }
+
+  if (provider === "Gemini") {
+    const start = Date.now();
+    const lastUser = [...messages].reverse().find((m) => m.role === "user");
+    const systemMsg = messages.find((m) => m.role === "system");
+    const history = messages
+      .filter((m) => m.role !== "system" && m !== lastUser)
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+    const parts: any[] = [lastUser ? { text: lastUser.content } : { text: "" }];
+    const body: any = {
+      contents: [...history, { role: "user", parts }],
+      generationConfig: { maxOutputTokens: 16384 },
+    };
+    if (systemMsg) body.system_instruction = { parts: [{ text: systemMsg.content }] };
+
+    let res: Response;
+    try {
+      res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse&key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+    } catch (e: any) {
+      return { ok: false, error: empty("Gemini", m, e?.message || "Network error", 0, Date.now() - start) };
+    }
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return { ok: false, error: empty("Gemini", m, data?.error?.message || `HTTP ${res.status}`, res.status, Date.now() - start, res.status === 429) };
+    }
+    return { ok: true, response: res, provider, model: m };
+  }
+
+  return { ok: false, error: empty(provider, m, `Streaming not available for ${provider}`, 501, 0) };
 }
 
 export const PROVIDER_DEFAULT_MODEL: Record<ProviderName, string> = {
