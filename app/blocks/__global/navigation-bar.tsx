@@ -10,6 +10,7 @@ import {
   IconChevronDown,
   IconLogout,
   IconMessage,
+  IconExternalLink,
 } from "@tabler/icons-react";
 import type { AuthUser } from "~/services/session.server";
 import styles from "./navigation-bar.module.css";
@@ -115,6 +116,17 @@ export function NavigationBar({ className, user }: NavigationBarProps) {
                 <IconSettings size={16} />
                 <span>Settings</span>
               </NavLink>
+              <a
+                href="https://www.linkedin.com/in/suryakant17155/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.dropdownItem}
+                role="menuitem"
+                onClick={() => setMenuOpen(false)}
+              >
+                <IconExternalLink size={16} />
+                <span>Contact Us</span>
+              </a>
               <Form
                 method="post"
                 action="/logout"
