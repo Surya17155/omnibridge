@@ -1,6 +1,22 @@
-import type { ActionFunctionArgs } from "react-router";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { authenticateOmniKey, openaiErrorResponse } from "~/services/proxy-auth.server";
 import { handleChatCompletion, type ProxyChatRequest } from "~/services/proxy.server";
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  return new Response(
+    JSON.stringify({
+      object: "chat.completions",
+      message: "OmniBridge API is running. Use POST with a valid JSON body including model, messages, and optional stream:true.",
+      docs: `${url.origin}/`,
+      playground: `${url.origin}/dashboard/chat`,
+    }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
