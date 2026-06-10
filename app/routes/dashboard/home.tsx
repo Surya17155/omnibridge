@@ -36,10 +36,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const systemStatus = {
     activeKeys: providerKeys.filter((k) => k.status === "active").length,
-    distinctProviders: providers.length,
+    distinctProviders: allProviders.length,
     hasOmniKey: !!omniKey,
     avgLatencyMs: Math.round(stats.avgResponseTime),
-    currentModel: providers.length > 0 ? stats.requestsByProvider[0]?.provider ?? providers[0] : "—",
+    currentModel: allProviders.length > 0 ? stats.requestsByProvider[0]?.provider ?? allProviders[0] : "—",
     totalRequests: stats.totalRequests,
   };
 
