@@ -18,9 +18,12 @@ type Props = {
   successRate: number;
   daily: Array<{ day: string; requests: number; successRate: number }>;
   byProvider: Array<{ provider: Provider; requests: number }>;
+  availableProviders?: Provider[];
+  filterDays?: number;
+  filterProvider?: string | null;
 };
 
-export function UsageStatistics({ totalRequests, totalTokens, successRate, daily, byProvider }: Props) {
+export function UsageStatistics({ totalRequests, totalTokens, successRate, daily, byProvider, availableProviders, filterDays, filterProvider }: Props) {
   const { ref: barRef, inView: barInView } = useInView<HTMLDivElement>(0.1);
   const maxRequests = byProvider.length > 0 ? Math.max(...byProvider.map((p) => p.requests), 1) : 1;
   const empty = totalRequests === 0;
@@ -82,7 +85,7 @@ export function UsageStatistics({ totalRequests, totalTokens, successRate, daily
       </div>
 
       {daily.length > 0 && daily.some((d) => d.requests > 0) ? (
-        <TrendChart data={daily} />
+        <TrendChart data={daily} availableProviders={availableProviders} filterDays={filterDays} filterProvider={filterProvider} />
       ) : null}
 
       <div className={styles.barSection} ref={barRef}>

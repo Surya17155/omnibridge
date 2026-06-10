@@ -98,48 +98,57 @@ export type UsageStats = {
   avgResponseTime: number;
 };
 
-export async function getUsageStats(userId: number): Promise<UsageStats> {
+export async function getUsageStats(userId: number, options: { days?: number; provider?: string } = {}): Promise<UsageStats> {
+  const { days: rawDays = 7, provider } = options;
+  const days = Math.max(1, Math.min(365, rawDays));
+
+  const conditions = ["user_id = ?"];
+  const params: any[] = [userId];
+  conditions.push("timestamp >= datetime('now', ? || ' days')");
+  params.push(`-${days}`);
+  if (provider) {
+    conditions.push("provider = ?");
+    params.push(provider);
+  }
+  const where = conditions.join(" AND ");
+
   const totals = await db.prepare(
     `SELECT
        COUNT(*) as total,
        COALESCE(SUM(tokens), 0) as totalTokens,
        COALESCE(AVG(response_time), 0) as avgRt,
        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as successCount
-     FROM request_logs WHERE user_id = ?`
-  ).get(userId) as any;
+     FROM request_logs WHERE ${where}`
+  ).get(...params) as any;
 
-  const byProvider = await db.prepare(
-    `SELECT provider, COUNT(*) as requests
-     FROM request_logs WHERE user_id = ?
-     GROUP BY provider
-     ORDER BY requests DESC`
-  ).all(userId) as unknown as Array<{ provider: string; requests: number }>;
+  const provParams = [...params];
+  const byProvider = provider
+    ? [{ provider, requests: totals.total }]
+    : await db.prepare(
+        `SELECT provider, COUNT(*) as requests
+         FROM request_logs WHERE ${where}
+         GROUP BY provider
+         ORDER BY requests DESC`
+      ).all(...provParams) as unknown as Array<{ provider: string; requests: number }>;
 
+  const dayParams = [...params];
   const byDay = await db.prepare(
     `SELECT
-       strftime('%w', timestamp) as dow,
+       date(timestamp) as day,
        COUNT(*) as requests,
        CASE WHEN COUNT(*) = 0 THEN 0
             ELSE 100.0 * SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) / COUNT(*)
        END as successRate
-     FROM request_logs
-     WHERE user_id = ? AND timestamp >= datetime('now', '-7 days')
-     GROUP BY dow
-     ORDER BY dow`
-  ).all(userId) as unknown as Array<{ dow: string; requests: number; successRate: number }>;
+     FROM request_logs WHERE ${where}
+     GROUP BY date(timestamp)
+     ORDER BY day`
+  ).all(...dayParams) as unknown as Array<{ day: string; requests: number; successRate: number }>;
 
-  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const dayMap = new Map(byDay.map((d) => [d.dow, d]));
-  const requestsByDay: UsageStats["requestsByDay"] = [];
-  for (let i = 0; i < 7; i++) {
-    const dow = String(i);
-    const row = dayMap.get(dow);
-    requestsByDay.push({
-      day: dayNames[i],
-      requests: row?.requests ?? 0,
-      successRate: row?.successRate ?? 0,
-    });
-  }
+  const requestsByDay: UsageStats["requestsByDay"] = byDay.map((r) => ({
+    day: formatDayLabel(r.day),
+    requests: r.requests,
+    successRate: r.successRate,
+  }));
 
   return {
     totalRequests: totals.total,
@@ -149,4 +158,13 @@ export async function getUsageStats(userId: number): Promise<UsageStats> {
     requestsByDay,
     avgResponseTime: totals.avgRt,
   };
+}
+
+function formatDayLabel(dateStr: string): string {
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  } catch {
+    return dateStr;
+  }
 }

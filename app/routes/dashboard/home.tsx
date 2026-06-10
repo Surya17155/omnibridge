@@ -14,9 +14,14 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const user = await requireAuth(request);
   const providerKeys = await getProviderKeys(user.id);
   const omniKey = await getOmniKey(user.id);
-  const stats = await getUsageStats(user.id);
 
-  const providers = Array.from(new Set(providerKeys.map((k) => k.provider))) as Provider[];
+  const url = new URL(request.url);
+  const days = parseInt(url.searchParams.get("days") || "7", 10);
+  const provider = url.searchParams.get("provider") || undefined;
+
+  const stats = await getUsageStats(user.id, { days, provider });
+
+  const allProviders = Array.from(new Set(providerKeys.map((k) => k.provider))) as Provider[];
 
   const usageStats = {
     totalRequests: stats.totalRequests,
@@ -50,7 +55,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
     addedAt: k.added_at,
   }));
 
-  return { usageStats, systemStatus, activeKeys, hasOmniKey: !!omniKey };
+  return { usageStats, systemStatus, activeKeys, hasOmniKey: !!omniKey, availableProviders: allProviders, filterDays: days, filterProvider: provider || null };
 }
 
 function maskKey(value: string): string {
