@@ -38,6 +38,11 @@ export function LandingNav() {
               </a>
             </li>
           ))}
+          <li>
+            <a href="https://github.com/Surya17155/omnibridge" target="_blank" rel="noopener noreferrer" className={styles.link}>
+              Github
+            </a>
+          </li>
         </ul>
 
         <Link to="/auth" className={styles.cta}>

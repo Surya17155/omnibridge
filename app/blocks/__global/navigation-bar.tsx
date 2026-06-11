@@ -127,6 +127,17 @@ export function NavigationBar({ className, user }: NavigationBarProps) {
                 <IconExternalLink size={16} />
                 <span>Contact Us</span>
               </a>
+              <a
+                href="https://github.com/Surya17155/omnibridge"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.dropdownItem}
+                role="menuitem"
+                onClick={() => setMenuOpen(false)}
+              >
+                <IconExternalLink size={16} />
+                <span>Github</span>
+              </a>
               <Form
                 method="post"
                 action="/logout"
