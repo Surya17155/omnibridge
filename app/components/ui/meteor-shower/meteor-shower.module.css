@@ -38,16 +38,14 @@
     opacity: 0;
     transform: translate3d(0, 0, 0);
   }
-  1.5% {
+  3% {
     opacity: 1;
   }
-  26% {
+  35% {
     opacity: 1;
   }
-  30% {
+  40% {
     opacity: 0;
-    /* Travel exclusively along the rotated X-axis for 150vw.
-       This prevents the "downward drop" effect and ensures it reaches the far-right edge */
     transform: translate3d(150vw, 0, 0);
   }
   100% {

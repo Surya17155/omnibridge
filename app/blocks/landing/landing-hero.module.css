@@ -96,9 +96,25 @@
   align-items: center;
 }
 
+@media (max-width: 640px) {
+  .hero {
+    padding: 120px var(--space-4) var(--space-10);
+  }
+
+  .grid {
+    background-size: 40px 40px;
+  }
+}
+
 @media (max-width: 560px) {
   .heroActions {
     width: 100%;
+  }
+
+  .grid {
+    background-size: 30px 30px;
+    mask-image: radial-gradient(ellipse 90% 60% at 50% 40%, #000 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 50% 40%, #000 30%, transparent 75%);
   }
 }
 

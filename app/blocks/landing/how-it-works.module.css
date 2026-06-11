@@ -108,10 +108,22 @@
 }
 
 @media (max-width: 860px) {
+  .section {
+    height: auto;
+  }
   .sticky {
+    position: static;
+    min-height: 0;
     grid-template-columns: 1fr;
     gap: var(--space-10);
     align-content: center;
+    padding: var(--space-12) var(--space-6);
+  }
+  .headCol {
+    max-width: 100%;
+  }
+  .stepTitle {
+    font-size: var(--text-xl);
   }
 }
 

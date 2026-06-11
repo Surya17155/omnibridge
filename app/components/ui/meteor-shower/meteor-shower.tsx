@@ -16,64 +16,24 @@ interface MeteorStyle {
   width: string;
 }
 
-const LOOP_DURATION = 40; // 40 seconds global cycle
-const DEFAULT_COUNT = 14; // Tuned for a spacious, uncrowded feel over 40 seconds
+const LOOP_DURATION = 18;
+const DEFAULT_COUNT = 18;
 
 function buildMeteors(count: number): MeteorStyle[] {
   const meteors: MeteorStyle[] = [];
-  let t = 0;
-  let i = 0;
+  const gap = LOOP_DURATION / count;
 
-  while (i < count) {
-    // Generate groups of 1, 2, or rarely 3 (three at most)
-    const rand = Math.random();
-    let groupSize = 1;
-    if (rand > 0.9) groupSize = 3;
-    else if (rand > 0.6) groupSize = 2;
-
-    groupSize = Math.min(groupSize, count - i);
-
-    // Synchronize the flock: establish a base starting position
-    // Starting further top/left ensures they traverse the whole screen
-    const baseTop = Math.random() * 40 - 25;
-    const baseLeft = Math.random() * 40 - 25;
-
-    for (let j = 0; j < groupSize; j++) {
-      // Stagger them slightly in formation
-      const topOffset = j * 4; // Shift down slightly
-      const leftOffset = j * -2; // Shift left to follow
-
-      meteors.push({
-        top: `${baseTop + topOffset}%`,
-        left: `${baseLeft + leftOffset}%`,
-        // Store base sequence time + stagger offset (stagger won't be scaled)
-        delay: `${t}|${j * 0.4}`,
-        duration: `${LOOP_DURATION}s`, // All meteors share the EXACT same duration to never drift
-        width: `${100 + Math.random() * 60}px`,
-      });
-    }
-
-    // Gap calculation: if it's a flock, force a larger gap before the next meteor
-    t += groupSize > 1 ? 4.0 : 2.5;
-    i += groupSize;
+  for (let i = 0; i < count; i++) {
+    meteors.push({
+      top: `${Math.random() * 80 - 30}%`,
+      left: `${Math.random() * 80 - 30}%`,
+      delay: `-${(i * gap + Math.random() * gap * 0.6).toFixed(2)}s`,
+      duration: `${LOOP_DURATION}s`,
+      width: `${80 + Math.random() * 80}px`,
+    });
   }
 
-  // Normalize all base delays so they strictly fill the 40s loop
-  // This completely eliminates long empty gaps when the sequence restarts
-  const scale = LOOP_DURATION / t;
-
-  return meteors.map((m) => {
-    const [baseStr, offsetStr] = m.delay.split("|");
-    const scaledBase = parseFloat(baseStr) * scale;
-    const offset = parseFloat(offsetStr);
-    const finalDelay = scaledBase + offset;
-
-    return {
-      ...m,
-      // Use negative delay to instantly populate the screen on page load
-      delay: `-${finalDelay.toFixed(2)}s`,
-    };
-  });
+  return meteors;
 }
 
 /**
