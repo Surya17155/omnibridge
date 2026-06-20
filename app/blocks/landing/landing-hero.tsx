@@ -82,7 +82,7 @@ export function LandingHero() {
           </Link>
         </motion.div>
 
-        <motion.div variants={item}>
+        <motion.div variants={item} style={{ marginTop: 8 }}>
           <a
             href="https://www.producthunt.com/products/omnibridge?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-omnibridge"
             target="_blank"
