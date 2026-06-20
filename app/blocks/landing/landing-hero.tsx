@@ -56,6 +56,21 @@ export function LandingHero() {
           Gemini, Groq, Nvidia, GitHub, Cerebras, Cohere and more — behind a single unified API key.
         </motion.p>
 
+        <motion.div variants={item}>
+          <a
+            href="https://www.producthunt.com/products/omnibridge?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-omnibridge"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              alt="Omnibridge - One API key. 16+ free AI providers. Zero limits. | Product Hunt"
+              width="250"
+              height="54"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1176490&theme=light&t=1781937712295"
+            />
+          </a>
+        </motion.div>
+
         <motion.div className={styles.heroActions} variants={item}>
           <Link to="/auth" className={styles.btnWrapper}>
             <button className={styles.btn}>
